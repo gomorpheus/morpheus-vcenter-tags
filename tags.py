@@ -12,7 +12,6 @@ def get_session_id(username, password):
     session_response = requests.post(vcenter + '/rest/com/vmware/cis/session', headers=session_headers, auth=(username, password), verify=False)
     session_id = session_response.json()['value']
     print 'session response: ' + session_response.text
-    print 'session_id: ' + session_id
     return session_id
 
 
@@ -29,7 +28,6 @@ def get_tag_id(session_id, tagname):
         print 'tag_details: ' + tag_details.text
         if tag_details.json()['value']['name'] == tagname:
             tag_id = tag_details.json()['value']['id']
-            print 'tag_id: ' + tag_id
         else:
             pass
     
@@ -45,7 +43,6 @@ def get_vm_id(session_id, vmname):
     for i in vm_response.json()['value']:
         if i['name'] == vmname:
             vm_id = i['vm']
-            print 'vm_id: ' + vm_id
         else:
             pass
     return vm_id
