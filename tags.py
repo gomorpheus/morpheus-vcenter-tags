@@ -11,6 +11,8 @@ def get_session_id(username, password):
         }
     session_response = requests.post(vcenter + '/rest/com/vmware/cis/session', headers=session_headers, auth=(username, password), verify=False)
     session_id = session_response.json()['value']
+    print 'session response: ' + session_response.text
+    print 'session_id: ' + session_id
     return session_id
 
 
@@ -20,11 +22,14 @@ def get_tag_id(session_id, tagname):
         "vmware-api-session-id": session_id
         }
     tag_response = requests.get(vcenter + '/rest/com/vmware/cis/tagging/tag', headers=headers, verify=False)
+    print 'tag_response: ' + tag_response.text
 
     for i in tag_response.json()['value']:
         tag_details = requests.get(vcenter + '/rest/com/vmware/cis/tagging/tag/id:' + i, headers=headers, verify=False)
+        print 'tag_details: ' + tag_details.text
         if tag_details.json()['value']['name'] == tagname:
             tag_id = tag_details.json()['value']['id']
+            print 'tag_id: ' + tag_id
         else:
             pass
     
@@ -36,9 +41,11 @@ def get_vm_id(session_id, vmname):
         "vmware-api-session-id": session_id
         }
     vm_response = requests.get(vcenter + '/rest/vcenter/vm', headers=headers, verify=False)
+    print 'vm_response: ' + vm_response.text
     for i in vm_response.json()['value']:
         if i['name'] == vmname:
             vm_id = i['vm']
+            print 'vm_id: ' + vm_id
         else:
             pass
     return vm_id
@@ -51,9 +58,9 @@ def create_tag_association(tag_id, vm_id, session_id):
     'vmware-api-session-id': session_id,
     }
     querystring = {"~action":"attach"}
-    payload = {"object_id": {"id": "vm-40935", "type": "VirtualMachine"}}
+    payload = {"object_id": {"id": vm_id, "type": "VirtualMachine"}}
     response = requests.post(vcenter + '/rest/com/vmware/cis/tagging/tag-association/id:' + tag_id, headers=headers, json=payload, params=querystring, verify=False)
-
+    print 'create tag response: ' + response.text
     return response.text
 
 
