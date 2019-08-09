@@ -8,11 +8,11 @@ This is a python wrapper script for the VCenter API that allows the association 
 
 Example:
 
-```python
+```text
 slimshady@localhost:~# python tags.py -u admin -p password -t mytag -vc https://vsphere.local -vm sas.prod.local
 ```
 
-```python
+```text
 slimshady@localhost:~# python tags.py -h
 usage: tags.py [-h] [-u USERNAME] [-p PASSWORD] [-t TAGNAME] [-vc VCENTER]
                [-vm VMNAME]
