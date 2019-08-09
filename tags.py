@@ -1,5 +1,5 @@
 import requests
-import sys
+import argparse
 
 
 def get_session_id(username, password):
@@ -9,7 +9,7 @@ def get_session_id(username, password):
         "vmware-use-header-authn": "test", 
         "vmware-api-session-id": "null"
         }
-    session_response = requests.post(vcenter + '/rest/com/vmware/cis/session', headers=headers, auth=(username, password), verify=False)
+    session_response = requests.post(vcenter + '/rest/com/vmware/cis/session', headers=session_headers, auth=(username, password), verify=False)
     session_id = session_response.json()['value']
     return session_id
 
@@ -58,11 +58,47 @@ def create_tag_association(tag_id, vm_id, session_id):
 
 
 if __name__ == '__main__':
-    username = sys.argv[1]
-    password = sys.argv[2]
-    tagname = sys.argv[3]
-    vcenter = sys.argv[4]
-    vmname = sys.argv[5]
+    parser = argparse.ArgumentParser(description='Script that takes in VCenter credentials, a VM name, a tag name (must exist) and associates the tag with the VM.')
+    parser.add_argument(
+        '-u',
+        '--username',
+        default='administrator',
+        help='provide a VCenter username'
+    )
+
+    parser.add_argument(
+        '-p',
+        '--password',
+        default='password',
+        help='provide a VCenter password'
+    )
+
+    parser.add_argument(
+        '-t',
+        '--tagname',
+        default='administrator',
+        help='provide a VCenter username'
+    )
+
+    parser.add_argument(
+        '-vc',
+        '--vcenter',
+        default='https://vcenter.local',
+        help='provide a VCenter URL'
+    )
+
+    parser.add_argument(
+        '-vm',
+        '--vmname',
+        default='example',
+        help='provide a Virtual Machine Name'
+    )
+    parsed = parser.parse_args()
+    username = parsed.username
+    password = parsed.password
+    tagname = parsed.tagname
+    vcenter = parsed.vcenter
+    vmname = parsed.vmname
     session_id = get_session_id(username, password)
     tag_id = get_tag_id(session_id, tagname)
     vm_id = get_vm_id(session_id, vmname)
