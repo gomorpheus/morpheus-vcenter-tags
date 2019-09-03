@@ -2,7 +2,7 @@ import requests
 import argparse
 
 
-def get_session_id(username, password):
+def get_session_id(vcenter, username, password):
     session_headers = {
         "Accept": "application/json", 
         "Content-Type": "application/json", 
@@ -15,7 +15,7 @@ def get_session_id(username, password):
     return session_id
 
 
-def get_tag_id(session_id, tagname):
+def get_tag_id(vcenter, session_id, tagname):
     headers = {
         "Accept": "application/json", 
         "vmware-api-session-id": session_id
@@ -33,7 +33,7 @@ def get_tag_id(session_id, tagname):
     
     return tag_id
 
-def get_vm_id(session_id, vmname):
+def get_vm_id(vcenter, session_id, vmname):
     headers = {
         "Accept": "application/json", 
         "vmware-api-session-id": session_id
@@ -48,12 +48,12 @@ def get_vm_id(session_id, vmname):
     return vm_id
 
 
-def create_tag_association(tag_id, vm_id, session_id):
+def create_tag_association(vcenter, tag_id, vm_id, session_id):
     headers = {
-    'Accept': "application/json",
-    'Content-Type': "application/json",
-    'vmware-api-session-id': session_id,
-    }
+        'Accept': "application/json",
+        'Content-Type': "application/json",
+        'vmware-api-session-id': session_id,
+        }
     querystring = {"~action":"attach"}
     payload = {"object_id": {"id": vm_id, "type": "VirtualMachine"}}
     response = requests.post(vcenter + '/rest/com/vmware/cis/tagging/tag-association/id:' + tag_id, headers=headers, json=payload, params=querystring, verify=False)
@@ -99,11 +99,8 @@ if __name__ == '__main__':
     )
     parsed = parser.parse_args()
     username = parsed.username
-    password = parsed.password
-    tagname = parsed.tagname
-    vcenter = parsed.vcenter
-    vmname = parsed.vmname
-    session_id = get_session_id(username, password)
-    tag_id = get_tag_id(session_id, tagname)
-    vm_id = get_vm_id(session_id, vmname)
-    create_tag_association(tag_id, vm_id, session_id)
+    
+    session_id = get_session_id(parsed.vcenter, parsed.username, parsed.password)
+    tag_id = get_tag_id(parsed.vcenter, session_id, parsed.tagname)
+    vm_id = get_vm_id(parsed.vcenter, session_id, parsed.vmname)
+    create_tag_association(parsed.vcenter, tag_id, vm_id, session_id)
